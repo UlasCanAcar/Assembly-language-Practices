@@ -1,0 +1,5 @@
+ORG 00H
+	MOV R4,  #15H  ; immediate addressing
+  MOV 07H, #15H 
+	MOV A,   07H   ; Direct Addressing
+END	

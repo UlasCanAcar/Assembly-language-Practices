@@ -9,4 +9,5 @@ ORG 00H
 	MOV B, R0    ;register addressing
 	
 	
+
 END	

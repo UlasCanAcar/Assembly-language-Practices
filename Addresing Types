@@ -1,7 +1,7 @@
 ORG 00H
 	MOV R4,  #15H  ; immediate addressing
 	
-        MOV 07H, #15H  ; Direct Addressing
-	
-	MOV A,   07H   ;Register addressing
+        MOV 07H, #15H  
+                  ; Direct Addressing
+	MOV A,   07H   
 END	

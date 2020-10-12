@@ -2,6 +2,11 @@ ORG 00H
 	MOV R4,  #15H  ; immediate addressing
 	
         MOV 07H, #15H  
-                  ; Direct Addressing
+                    ; Direct Addressing
 	MOV A,   07H   
+	
+	MOV R0, #0dH
+	MOV B, R0    ;register addressing
+	
+	
 END	

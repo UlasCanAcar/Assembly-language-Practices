@@ -2,6 +2,15 @@ ORG 00H
 	MOV r0, #5H
 	MOV r1, #3H
 	MOV  A,  R0
-	ADD  A,  R1
+	ADD  A,  R1 ; adding register A and R1
+	INC  A      ; increasing register A value by 1
+	
+	SUBB A, R0  ; substracting A from R0 
+	DEC  A      ; decreasing A by 1
+	
+	MOV  B, R1 
+	MUL  AB     ; Multiplying values of Register A and B
+	
+	DIV  AB     ; Dividing values of Register A and B
 	
 END	

@@ -1,0 +1,8 @@
+ORG 00H
+	
+	MOV R7, #47
+	MOV R1, #10010110
+	MOV R5, #0E4H
+	MOV A, R5
+  
+END	

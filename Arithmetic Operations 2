@@ -1,0 +1,28 @@
+ORG 00H
+	
+   MOV  R0, #01010011b ;x
+   MOV  R1, #11101010b ;y
+   MOV  R2, #11010110b ;z
+   MOV  R3, #10111100b ;u
+   MOV  R4, #11110010b ;v
+   MOV  R5, #10100100b ;m
+   MOV  R6, #11111110b ;n
+   MOV  R7, #10001101b ;t
+   
+   MOV  A, R5
+   ORL  A, R6
+   MOV  R5, A ; m+n
+   clr  A 
+   MOV  A, R3
+   ORL  A, R4
+   ANL  A, R2
+   MOV  R3, A ; z(u+v)
+   clr  A
+   MOV  A, R7
+   ANL  A, R5 ; t(m+n)
+   ORL  A, R0 ; t(m+n)+x
+   ORL  A, R1 ; t(m+n)+x+y
+   ORL  A, R3 ; t(m+n)+x+y+z(u+v)
+
+ END	
+	

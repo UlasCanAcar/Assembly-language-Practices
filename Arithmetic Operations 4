@@ -1,0 +1,17 @@
+ORG 00H
+	
+ MOV R0, #5  ;x
+ MOV R4, #60 ;u
+ MOV R6, #6  ;m
+ MOV R3, #2  ;t
+ 
+ MOV  A, 00H ; A->x
+ ADD  A, 04h ; A->x+u
+ ADD  A, 06H ; A->x+u+m
+ 
+ MOV  B, 03H ; B->t
+ 
+ DIV AB  ; (x+u+m) / t
+
+END
+

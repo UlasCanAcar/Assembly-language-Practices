@@ -1,0 +1,20 @@
+ORG 00H
+	
+ MOV R0, #5  ;x
+ MOV  A, R0  ;  A->x
+ MOV R1, #15 ;y
+ ADD  A, R1  ;  A->x+y
+ MOV R2, #36 ;z
+ ADD  A, R2  ;  A->x+y+z
+ MOV R3, #2  ;t
+ ADD  A, R3  ;  A->x+y+z+t
+ MOV R4, #60 ;u
+ ADD  A, R4  ;  A->x+y+z+t+u
+ MOV R5, #4  ;v
+ SUBB  A, R5 ;  A->x+y+z+t+u-v
+ MOV R6, #6  ;m
+ SUBB  A, R6 ;  A->x+y+z+t+u-v-m
+ MOV R7, #18 ;n
+ SUBB  A, R7 ;  A->x+y+z+t+u-v-m-n
+
+END

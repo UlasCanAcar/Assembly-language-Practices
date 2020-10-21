@@ -1,0 +1,24 @@
+ORG 00H
+	
+ MOV p1, #00h ;clearing all the pins of port 1
+ infinite_loop:
+ setb p1^0 ;set first pin of the port 1 as true
+ acall delay ; delaying
+ clr p1^0 ; clearing
+ acall delay
+	 setb p1^1 ;set second pin of the port 1 as true
+     acall delay 
+	 clr p1^1 ;clearing
+     acall delay
+		 setb p1^2 ;set third pin of theport 1 as true
+         acall delay
+		 clr p1^2 ;clearing
+	     acall delay
+  sjmp infinite_loop
+
+  delay: MOV R7, #01H
+   djnz R7, $ ;delay function
+       ret
+  
+END
+  

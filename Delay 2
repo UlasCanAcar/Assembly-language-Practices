@@ -1,0 +1,21 @@
+ORG 00H
+	
+    MOV p1, #00h
+	Loop:
+	setb p1^7
+	acall Delay
+	clr p1^7
+	acall Delay
+	sjmp Loop
+	
+	
+	acall Delay
+	Delay:
+	MOV r0, #5D
+	Inner_Loop: MOV r1, #255d
+	           djnz r1, $
+	djnz r0, Inner_Loop		
+     ret	
+	
+	
+END 

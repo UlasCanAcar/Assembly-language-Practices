@@ -1,0 +1,23 @@
+ORG 00H
+	
+	mov p1, #00h
+	loop:
+	 setb p1^7
+	 acall  longer_loop
+	 clr  p1^7
+	 acall  longer_loop
+	 sjmp loop
+	
+	longer_loop: mov r2, #32d
+	repeat:     acall delay
+	            djnz r2, repeat
+				ret
+	
+	delay:
+	mov r0, #255d
+	loop2: mov r1, #255d
+	      djnz r1,  $
+	djnz r0, loop2;
+    ret	
+	
+END

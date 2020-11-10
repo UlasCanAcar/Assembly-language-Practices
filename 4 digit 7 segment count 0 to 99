@@ -1,0 +1,62 @@
+ORG 00H		
+	MOV p2,  #00H
+	MOV p3,  #00H	
+	
+	
+	infinite_loop:
+	mov r4, #0h
+	mov r5, #10d
+	finite_loop2:
+	
+	mov dptr, #40h
+	mov r7, #10d
+	
+	mov a, r4
+	movc a, @a+dptr
+	mov r0, a
+	
+	finite_loop:
+	setb p3^0 	
+	mov p2, r0
+	acall delay
+	clr p3^0
+	
+	mov a, #0h
+	setb p3^1
+	movc a, @a+dptr
+	mov p2, a
+	acall delay
+	clr p3^1
+	
+	inc dptr
+    djnz r7, finite_loop
+	inc r4
+	
+	djnz r5, finite_loop2
+	
+    sjmp infinite_loop
+    
+
+	org 40h
+		db   0c0h, 0f9h, 0a4h, 0b0h, 99h, 92h, 82h, 0f8h, 80h, 90h	
+			
+	        
+			delay2:
+			mov r6, #0ffh
+			djnz r6, $
+			ret
+			
+			
+			longer_delay: MOV r2, #8d
+
+repeat:            acall delay
+                   djnz r2, repeat
+				   ret
+				   
+	delay:
+	MOV r3, #100d
+	inner_loop: MOV r1, #255d
+	            djnz r1, $
+    djnz r3, inner_loop
+    ret 
+end

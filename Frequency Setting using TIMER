@@ -1,0 +1,22 @@
+org 00h
+MOV TMOD, #10h ;timer 0 will run in mode 1
+
+    loop:
+  setb p3^5
+  acall delay  
+  nop
+  nop
+  clr p3^5
+  acall delay
+  sjmp loop
+  
+	delay:
+  mov TH1, #0FFh 
+  mov TL1, #0DDh
+  setb TR1 ; turn timer 1 on 
+  wait: jnb TF1, wait ;wait here until timer 1 flag is 1
+  clr TR1 ; turn timer 1 off
+  clr TF1 ; clear timer 1 flag
+  ret
+
+end

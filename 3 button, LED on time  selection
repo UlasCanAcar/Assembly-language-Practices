@@ -1,0 +1,57 @@
+ORG 00H		
+	MOV p0,  #00H
+	MOV p2,  #00H
+	MOV p3,  #00H
+	MOV p1,  #00H
+	mov dptr, #40h
+	setb p3^0
+	mov r5, #01h
+	
+	infinite_loop:
+	
+	JB p0^0, count_up
+	JB p0^1, count_down
+  JB p0^2, selection_done
+    
+	mov a, r5
+	movc a, @a+dptr
+	mov p2, a
+	
+	sjmp infinite_loop
+	
+	count_up:
+	inc r5
+	wait1: jb p0^0, wait1
+	sjmp infinite_loop
+	
+	count_down:
+	dec r5
+	wait2: jb p0^1, wait2
+    sjmp infinite_loop
+	
+    selection_done:
+	light:
+	setb p1^2
+	acall longer_delay
+	djnz r5, light
+	clr p1^2
+	wait3: jb p0^2, wait3
+	sjmp infinite_loop 
+
+	org 40h
+		db   0c0h, 0f9h, 0a4h, 0b0h, 99h, 92h, 82h, 0f8h, 80h, 90h	
+			
+			longer_delay: MOV r2, #8d
+
+repeat:            acall delay
+                   djnz r2, repeat
+				   ret
+				   
+	delay:
+	MOV r3, #255d
+	inner_loop: MOV r1, #255d
+	            djnz r1, $
+    djnz r3, inner_loop
+    ret 
+end
+	

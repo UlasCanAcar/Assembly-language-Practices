@@ -1,0 +1,38 @@
+org 00h
+	
+	mov P2, #00h  // sets port 2 as output port
+	setb p2^2     // enable 1
+	setb p2^5     // enable 2
+	
+	infinite_loop:   
+	jb p1^0, forward  
+	jb p1^1, backward
+	jb p1^2, right
+	jb p1^3, left
+
+    sjmp infinite_loop
+  forward:  
+      setb p2^1
+	   wait: jb p1^0, wait
+	   clr p2^1
+	   sjmp infinite_loop
+  
+  backward:
+	  setb p2^0
+	    wait2: jb p1^1, wait2
+	   clr p2^0
+	   sjmp infinite_loop
+	
+  right:
+     setb p2^7
+	   wait3: jb p1^2, wait3
+	   clr p2^7
+	   sjmp infinite_loop
+
+  left:
+	setb p2^6
+	    wait4: jb p1^3, wait4
+	   clr p2^6
+	   sjmp infinite_loop
+	
+end	

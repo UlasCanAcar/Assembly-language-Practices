@@ -1,0 +1,107 @@
+ORG 00H                 // origin
+MOV DPTR,#LUT           // moves the address of LUT to DPTR
+MOV P1,#00000000B       // sets P1 as output port
+MOV P0,#00000000B       // sets P0 as output port
+CLR P3.0                // sets P3.0 as output for sending trigger
+SETB P3.1               // sets P3.1 as input for receiving echo
+MOV TMOD,#00100000B     // sets timer1 as mode 2 auto reload timer
+MAIN: MOV TL1,#207D     // loads the initial value to start counting from
+      MOV TH1,#207D     // loads the reload value
+      MOV A,#00000000B  // clears accumulator
+      SETB P3.0         // starts the trigger pulse
+      ACALL DELAY1      // gives 10uS width for the trigger pulse
+      CLR P3.0          // ends the trigger pulse
+HERE: JNB P3.1,HERE     // loops here until echo is received
+BACK: SETB TR1          // starts the timer1
+HERE1: JNB TF1,HERE1    // loops here until timer overflows (ie;48 count)
+      CLR TR1           // stops the timer
+      CLR TF1           // clears timer flag 1
+      INC A             // increments A for every timer1 overflow
+      JB P3.1,BACK      // jumps to BACK if echo is still available
+      MOV R4,A          // saves the value of A to R4
+	  ACALL LED         // activates the LEDs for given conditions
+toDisplay: ACALL DLOOP  // calls the display loop
+	  MOV P3,#00000000B // turns off LEDs
+      SJMP MAIN         // jumps to MAIN loop
+
+DELAY1: MOV R6,#2D      // 10uS delay
+LABEL1: DJNZ R6,LABEL1
+        RET     
+
+DLOOP: MOV R5,#100D    // loads R5 with 100D
+BACK1: MOV A,R4        // loads the value in R4 to A
+       MOV B,#100D     // loads B with 100D
+       DIV AB          // isolates the first digit
+       SETB P1.0       // activates LED display unit D1
+       ACALL DISPLAY   // calls DISPLAY subroutine
+       MOV P0,A        // moves digit drive pattern for 1st digit to P0
+       ACALL DELAY     // 1mS delay
+       ACALL DELAY
+       MOV A,B         // moves the remainder of 1st division to A
+       MOV B,#10D      // loads B with 10D
+       DIV AB          // isolates the second digit
+       CLR P1.0        // deactivates LED display unit D1
+       SETB P1.1       // activates LED display unit D2
+       ACALL DISPLAY
+       MOV P0,A        // moves digit drive pattern for 2nd digit to P0
+       ACALL DELAY
+       ACALL DELAY
+       MOV A,B         // moves the remainder of 2nd division to A
+       CLR P1.1        // deactivates LED display unit D2
+       SETB P1.2       // activates LED display unit D3
+       ACALL DISPLAY
+       MOV P0,A        // moves the digit drive pattern for 3rd digit to P0
+       ACALL DELAY
+       ACALL DELAY
+       CLR P1.2       // deactivates LED display unit D3
+       DJNZ R5,BACK1  // repeats the display loop 100 times
+       RET
+
+DELAY: MOV R7,#250D        // 1mS delay
+LABEL2: DJNZ R7,LABEL2
+        RET
+
+DISPLAY: MOVC A,@A+DPTR   // gets the digit drive pattern for the content in A
+         CPL A            // complements the digit drive pattern (see Note 1)
+         RET
+		 
+LED:	cjne A, #9h, green1             //checks if measured distance is equal to given condition
+        setb p3^7  // Green LED on
+green1: cjne A, #8h, green2             // if it is equal to given condition 
+		setb p3^7  // Green LED on
+green2:	cjne A, #7h, toYellow           //  does the subroutine
+		setb p3^7  // Green LED on 
+                                        // then keep jumping until it reaches back to main function
+toYellow:cjne A, #6h, yellow1           // if it is not equal keep jump until find equal 
+         setb p3^6  // Yellow LED on
+yellow1: cjne A, #5h, yellow2
+		 setb p3^6  // Yellow LED on
+yellow2: cjne A, #4h, toRed
+		 setb p3^6  // Yellow LED on
+	 
+toRed:	cjne A, #3h, red1
+        setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on
+red1:   cjne A, #2h, red2
+		setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+red2:   cjne A, #1h, red3
+		setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+red3:   cjne A, #0h, toDisplay
+        setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+	    
+		ret
+		
+LUT: DB 3FH               // look up table (LUT) starts here
+     DB 06H
+     DB 5BH
+     DB 4FH
+     DB 66H
+     DB 6DH
+     DB 7DH
+     DB 07H
+     DB 7FH
+     DB 6FH
+END

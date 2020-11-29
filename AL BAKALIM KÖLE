@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct CarPrice
+{
+    int motor_capacity;
+    int tax_free_price;
+
+};
+
+int main()
+{
+   struct CarPrice MyCar;
+   printf("Enter the capacity of your car in cm^3\n");
+   scanf("%d", &MyCar.motor_capacity );
+   printf("Enter the tax free price of your car\n");
+   scanf("%d", &MyCar.tax_free_price );
+
+   if(MyCar.motor_capacity < 1600 && MyCar.tax_free_price < 85000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 145;
+   }
+    else if(MyCar.motor_capacity < 1600 && MyCar.tax_free_price >= 85000 && MyCar.tax_free_price <= 130000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 150;
+   }
+    else if(MyCar.motor_capacity < 1600 && MyCar.tax_free_price > 130000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 180;
+   }
+    else if(MyCar.motor_capacity >= 1600 && MyCar.motor_capacity < 2000  && MyCar.tax_free_price < 170000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 230;
+   }
+    else if(MyCar.motor_capacity >= 1600 && MyCar.motor_capacity < 2000  && MyCar.tax_free_price >= 170000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 250;
+   }
+   else if(MyCar.motor_capacity >= 2000 )
+   {
+       MyCar.tax_free_price = (MyCar.tax_free_price / 100) * 320;
+   }
+
+
+   MyCar.tax_free_price = ( MyCar.tax_free_price / 100 )* 118;
+
+   printf("The taxed price of your car is: %d\n", MyCar.tax_free_price);
+
+
+   
+}

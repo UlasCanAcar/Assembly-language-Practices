@@ -1,0 +1,51 @@
+   DJNZ R5,BACK1  // repeats the display loop 100 times
+       RET
+
+DELAY: MOV R7,#250D        // 1mS delay
+LABEL2: DJNZ R7,LABEL2
+        RET
+
+DISPLAY: MOVC A,@A+DPTR   // gets the digit drive pattern for the content in A
+         CPL A            // complements the digit drive pattern (see Note 1)
+         RET
+		 
+LED:	cjne A, #9h, green1             //checks if measured distance is equal to given condition
+        setb p3^7  // Green LED on
+green1: cjne A, #8h, green2             // if it is equal to given condition 
+		setb p3^7  // Green LED on
+green2:	cjne A, #7h, toYellow           //  does the subroutine
+		setb p3^7  // Green LED on 
+                                        // then keep jumping until it reaches back to main function
+toYellow:cjne A, #6h, yellow1           // if it is not equal keep jump until find equal 
+         setb p3^6  // Yellow LED on
+yellow1: cjne A, #5h, yellow2
+		 setb p3^6  // Yellow LED on
+yellow2: cjne A, #4h, toRed
+		 setb p3^6  // Yellow LED on
+	 
+toRed:	cjne A, #3h, red1
+        setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on
+red1:   cjne A, #2h, red2
+		setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+red2:   cjne A, #1h, red3
+		setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+red3:   cjne A, #0h, toDisplay
+        setb p3^4  // Red LED on
+        setb p3^5  // Buzzer on 
+	    
+		ret
+		
+LUT: DB 3FH               // look up table (LUT) starts here
+     DB 06H
+     DB 5BH
+     DB 4FH
+     DB 66H
+     DB 6DH
+     DB 7DH
+     DB 07H
+     DB 7FH
+     DB 6FH
+END

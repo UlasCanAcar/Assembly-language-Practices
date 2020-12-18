@@ -1,0 +1,101 @@
+org 00h
+mov p0, #0f0h  ; motor driver
+mov p1, #0fh   ; key pad
+mov p2, #00h   ; number selection port
+mov p3, #00h   ; screen selection port
+mov dptr, #0c0h ; number table 
+mov TMOD, #01h ; timer mod set
+mov TH0, #0ffh ; timer load
+mov TL0, #0ffh ; timer load
+mov r2, #00h    
+
+loop:
+jb p0^7, button_read  ; data available
+cjne r2, #1h, jump1
+mov r7, b ; data storage
+jump1: cjne r2, #2h, jump2
+mov r6, b ;data storage
+jump2: cjne r2, #3h, jump3
+mov r5, b ;data storage
+jump3: cjne r2, #4h, jump4
+mov r4, b ; data storage
+
+jump4: cjne r7, #7h, jump5 ; checking password
+check1:cjne r6, #4h, jump5 ; if it is matched with
+check2:cjne r5, #5h, jump5 ; the number that is pressed
+check3:cjne r4, #2h, jump5 ; motor will be activated
+
+; MOTOR
+setb p0^2         ; enable
+setb p0^1         ; door opening
+acall longer_loop ; 4 sec delay
+clr  p0^1
+setb p0^0         ; door closing
+acall longer_loop ; 4 sec delay
+clr p0^0
+
+jump5:
+mov r3,#4h
+mov r0, #07h  ;numbers selected
+mov r1,#1h    ;screen selection 
+finite_loop:  ;display loop
+mov a, @r0
+dec r0
+movc a,@a+dptr
+mov p3, r1
+mov p2,a
+mov a, r1
+RL a
+mov r1, a
+acall delay
+djnz r3, finite_loop
+sjmp loop
+
+button_read:
+wait: jb p0^7, wait
+mov r0, p1 ; loading data to the register
+mov b, p1
+cjne r0,#0h,next1
+inc b
+next1:cjne r0,#1h,next2  ;configuration for 16 to 12 keypad
+inc b
+next2: cjne r0,#2h, next3
+inc b
+next3: cjne r0,#8h, next4
+dec b
+next4: cjne r0,#9h, next5
+dec b
+next5: cjne r0,#0ah, nxt6
+dec b
+nxt6: cjne r0,#0dh, next7
+mov b,#0h
+next7:
+inc r2
+cjne r2,#05h, continue
+mov r2,#00h
+continue:
+sjmp loop
+
+org 0c0h
+db 0c0h,0f9h,0a4h, 0b0h,99h, 92h, 82h, 0f8h, 80h, 90h
+	
+longer_loop: mov r5, #30d
+	repeat:     acall delay1
+	            djnz r5, repeat
+				ret
+	
+	delay1:
+	mov r4, #255d
+	loop2: mov r6, #255d
+	      djnz r6,  $
+	djnz r4, loop2;
+    ret	
+	
+	
+	delay:
+setb TR0
+wait_f: jnb TF0, wait_f
+clr TR0
+clr TF0
+ret
+end

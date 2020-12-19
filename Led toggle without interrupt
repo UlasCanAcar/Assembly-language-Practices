@@ -1,0 +1,28 @@
+org 00h
+	mov p1, #00h
+	mov tmod, #01h ;timer 0 16bit mode 
+	loop:
+	setb p1^5
+	acall delay
+	clr p1^5
+	acall delay
+	jnb p3^2,task
+
+    sjmp loop
+	
+	task:
+	cpl p1^0
+	sjmp loop
+	
+	delay: ; for 1 second delay
+	mov r0, #15d
+	again: mov th0, #0bh
+	mov tl0, #0e6h
+	setb tr0
+	wait: jnb tf0, wait
+	clr tr0
+	clr tf0
+	djnz r0, again
+	ret
+	
+	end

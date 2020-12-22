@@ -1,0 +1,77 @@
+org 00h
+	mov tmod, #01h ;timer 0 16bit mode 
+	
+	loop:
+	mov a, #38h
+	acall lcd_command_write ; enable 5x7 mode for char
+	mov a, #0eh
+	acall lcd_command_write ; display off, cursor on
+	mov a, #01h
+	acall lcd_command_write ; clear display
+	mov a, #80h
+	acall lcd_command_write ; move the cursor to beginning of first line
+	
+	
+	mov a, #157d
+	mov b, #5h
+	mul ab
+	add a, b
+	mov r1, a
+	mov a, b
+	mov r0, #30h
+	add a, r0
+	acall lcd_data_write
+	
+	mov a, #00101110b
+	acall lcd_data_write
+	
+	mov r5, #6d
+	display_loop:
+	mov a, r1
+	mov b, #10d
+	mul ab
+	add a, b
+	mov r1, a
+	mov a, b
+	mov r0, #30h
+	add a, r0
+	acall lcd_data_write
+	djnz r5, display_loop
+
+	;mov a, #0c0h
+
+	
+    sjmp loop
+	
+	
+	lcd_command_write:
+	mov p0, a
+	clr p2^0  ; RS bit = 0
+	clr p2^1  ; RW bit = 0
+	setb p2^2 ; Enable bit = 0
+	acall delay
+	clr p2^2 ; High to Low Pulse
+	ret
+	
+	lcd_data_write:
+	mov p0, a
+	setb p2^0  ; RS bit = 1
+	clr p2^1  ; RW bit = 0
+	setb p2^2 ; Enable bit = 0
+	acall delay
+	clr p2^2 ; High to Low Pulse
+	ret
+	
+	
+	
+	
+	delay: 
+	mov th0, #00h
+	mov tl0, #00h
+	setb tr0
+	wait_flag: jnb tf0, wait_flag
+	clr tr0 ; stop timer 
+	clr tf0 ; clear timer flag
+	ret
+	
+	end

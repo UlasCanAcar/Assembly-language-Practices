@@ -1,0 +1,27 @@
+THe0  EQU 8CH ; sfr address = 8CH
+Tle0  EQU 8AH ; sfr address = 8AH
+IEN   EQU 0A8H ; sfr address = A8H
+T0CON EQU 88H ; sfr address = 88H
+TMOD0 EQU 89H ; sfr address = 89H
+
+ORG 00H ; reset addresses
+SJMP START ; short jump over reserved area
+
+ORG 0BH ; Timer 0 interrupt vector address
+SJMP TASK ; go to interrupt routine
+
+ORG 30H ; program start address at 0030H
+	
+START:
+	   MOV THe0,  #0FFH ; 3BFB
+	   MOV TLe0,  #0FfH ;
+       SETB EA ;  enable all
+       ORL IEN,   #2H ; enable Timer 0 interrupt
+       ORL T0CON, #10H ; turn Timer 0 on
+	   ORL TMOD0, #01H ; timer 0 mode 1
+AGAIN: SJMP AGAIN ; stay here till interrupt occurs
+
+TASK:  CPL P1^1 ; complement (i.e. toggle) pin 1 port 1
+       ANL TCON, #7FH ; clear Timer2 flag(TF2)
+       RETI ; return from interrupt routine
+END ; end of assembly language

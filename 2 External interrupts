@@ -1,0 +1,36 @@
+org 00h
+	sjmp start
+	org 13h ; external interrupt 1 vector address
+		sjmp task
+	org 30h	
+	start:
+	mov p1, #00h
+	mov tmod, #01h ;timer 0 16bit mode 
+	setb it1 ; interrupt edge triggered
+	setb ea  ; enable all set interrupts
+	setb ex1 ; enable int1 interrupts
+	
+	loop:
+	setb p1^2
+	acall delay
+	clr p1^2
+	acall delay
+
+    sjmp loop
+	
+	task:
+	cpl p1^6
+	reti ; return from interrupt
+	
+	delay: ; for 1 second delay
+	mov r0, #15d
+	again: mov th0, #0bh
+	mov tl0, #0e6h
+	setb tr0
+	wait: jnb tf0, wait
+	clr tr0
+	clr tf0
+	djnz r0, again
+	ret
+	
+	end

@@ -1,0 +1,59 @@
+org 00h
+	mov tmod, #01h ; timer 0 16 bit mode
+	mov P2, #00h
+	
+	loop:
+	
+	clr p3^4 ; apply 0 volts to Chip Select
+	setb p3^5 ; make Read pin 1
+	clr p3^6
+	acall delay
+	setb p3^6 ; apply low to high pulse to Write pin for starting conversion
+	wait: jb p3^7, wait ; wait until INTR=0
+	clr p3^5 ; high to low pulse to RD for reading data from ADC
+	acall delay
+	mov a, p1 ; read the voltage as a byte
+	mov r1, a
+	mov b, #0F4h ; 
+	mul ab      ; 
+	mov a, b
+	add a, r1
+	
+	setb p2^4 ; Enable Motor Driver
+
+CJNE  a,#45d,NOTEQUAL
+setb p2^5 ; equal code goes here, then branch out
+sjmp jumpout
+NOTEQUAL:
+JC LESSTHEN ; less than code goes here, then branch out
+setb p2^5
+sjmp jumpout
+LESSTHEN:  ; greater code goes here
+clr p2^5
+
+jumpout:
+
+CJNE  a,#60d,NOTEQUAL2
+setb p2^7 ; equal code goes here, then branch out
+sjmp jumpout2
+NOTEQUAL2:
+JC LESSTHEN2
+setb p2^7
+sjmp jumpout2
+lESSTHEN2:
+clr p2^7
+
+jumpout2:
+
+	sjmp loop
+	
+	delay:
+	mov th0, #00h
+	mov tl0, #00h
+	setb tr0 ; start timer
+	wait_flag: jnb tf0, wait_flag
+	clr tr0 ; stop timer
+	clr tf0 ; clear timer flag
+	ret
+	
+	end

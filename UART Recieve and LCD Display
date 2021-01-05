@@ -48,11 +48,19 @@ org 00h
 	clr p2^2
 	ret
 	
-	
 	serial_send:
 	mov SBUF, a ;  move the data to send in serial buffer
 	wait1: JNB ti, wait1 ; wait for last data to be sent over
 	clr ti ; clear transmit interrupt flag
+	ret
+	
+	delay:
+	mov th0, #00h
+	mov tl0, #00h
+	setb tr0
+	wait_flag1: JNB tf0, wait_flag1
+	clr tr0
+	clr tf0
 	ret
 	
 	

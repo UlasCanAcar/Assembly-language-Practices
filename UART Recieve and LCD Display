@@ -1,0 +1,60 @@
+org 00h
+	mov TMOD, #21h ; Timer 1 in mode 2 and Timer 0 is in 16 bit mode
+	mov SCON, #50h ; UART with mode 1 (8 bit) REN = 1
+	mov th0, #0fdh 
+	mov tl0, #0fdh ; 9600 bauds at 11.0592 MHz
+	setb tr1 ; Stars Timer 1
+	
+	loop:
+	mov a, #38h
+	acall lcd_command_write ; enable 5x7 mode for char
+	mov a, #0eh
+	acall lcd_command_write ; display off, cursor on
+	mov a, #01h
+	acall lcd_command_write ; clear display
+	mov a, #80h
+	acall lcd_command_write ; move the cursor to beginning of first line
+	
+	acall serial_read
+	acall lcd_data_write
+	
+	sjmp loop
+	
+	serial_read:
+	wait2: JNB ri, wait2 ; wait for recieved interrupt flag
+	mov a, SBUF; read the data from serial buffer
+	clr ri ; clear recieve interrupt
+	ret
+	
+	
+	
+	
+	
+	lcd_command_write:
+	mov p0, a
+	clr p2^0
+	clr p2^1
+	setb p2^2
+	acall delay
+	clr p2^2
+	ret
+	
+	lcd_data_write:
+	mov p0, a
+	setb p2^0
+	clr p2^1
+	setb p2^2
+	acall delay
+	clr p2^2
+	ret
+	
+	
+	serial_send:
+	mov SBUF, a ;  move the data to send in serial buffer
+	wait1: JNB ti, wait1 ; wait for last data to be sent over
+	clr ti ; clear transmit interrupt flag
+	ret
+	
+	
+	
+end	

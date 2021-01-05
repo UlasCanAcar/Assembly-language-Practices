@@ -1,0 +1,65 @@
+org 00h
+	mov tmod, #01h ; timer 0 mode 1 - 16 bit timer mod
+	
+	
+	loop:
+	mov p1, #128d
+	acall delay
+	mov p1, #167d
+	acall delay
+	mov p1, #202d
+	acall delay
+	mov p1, #231d
+	acall delay
+	mov p1, #249d
+	acall delay
+	mov p1, #255d
+	acall delay
+	mov p1, #249d
+	acall delay
+	mov p1, #231d
+	acall delay
+	mov p1, #202d
+	acall delay
+	mov p1, #167d
+	acall delay
+	mov p1, #128d
+	acall delay
+	mov p1, #89d
+	acall delay
+	mov p1, #54d
+	acall delay
+	mov p1, #25d
+	acall delay
+	mov p1, #8d
+	acall delay
+	mov p1, #0d
+	acall delay
+	mov p1, #8d
+	acall delay
+	mov p1, #25d
+	acall delay
+	mov p1, #54d
+	acall delay
+	mov p1, #89d
+	acall delay
+	mov p1, #128d
+	acall delay
+	mov p1, #167d
+	acall delay
+
+
+	sjmp loop
+
+		
+		
+	delay:	;1 ms delay
+	mov th0, #0fch
+	mov tl0, #17h
+	setb tr0
+	wait_flag: jnb tf0, wait_flag
+	clr tr0
+	clr tf0
+	ret	
+	
+end

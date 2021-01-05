@@ -1,0 +1,30 @@
+org 00h
+	mov tmod, #01h ; timer 0 mode 1 - 16 bit timer mod
+	
+	
+	loop:
+	inner_loop1:
+	mov p1, r0
+	inc r0
+	acall delay
+    cjne r0, #255d, inner_loop1
+	inner_loop2:
+	mov p1, r0
+	dec r0
+	acall delay
+    cjne r0, #0d, inner_loop2
+	
+	sjmp loop
+
+		
+		
+	delay:	;1 ms delay
+	mov th0, #0fch
+	mov tl0, #17h
+	setb tr0
+	wait_flag: jnb tf0, wait_flag
+	clr tr0
+	clr tf0
+	ret	
+	
+end

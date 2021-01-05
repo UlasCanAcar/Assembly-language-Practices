@@ -1,0 +1,42 @@
+org 00h
+	mov TMOD, #20h ; Timer 1 in mode 2
+	mov SCON, #50h ; UART with mode 1 (8 bit) REN = 1
+	mov th0, #0fdh 
+	mov tl0, #0fdh ; 9600 bauds at 11.0592 MHz
+	setb tr1 ; Stars Timer 1
+	
+	loop:
+	mov a, #'H'
+	acall serial_send
+	mov a, #'E'
+	acall serial_send
+	mov a, #'L'
+	acall serial_send
+	mov a, #'L'
+	acall serial_send
+	mov a, #'O'
+	acall serial_send
+	mov a, #' '
+	acall serial_send
+	mov a, #'W'
+	acall serial_send
+	mov a, #'O'
+	acall serial_send
+	mov a, #'R'
+	acall serial_send
+	mov a, #'L'
+	acall serial_send
+	mov a, #'D'
+	acall serial_send
+	sjmp loop
+	
+	
+	serial_send:
+	mov SBUF, a ;  move the data to send in serial buffer
+	wait1: JNB ti, wait1 ; wait for last data to be sent over
+	clr ti ; clear transmit interrupt flag
+	ret
+	
+	
+	
+end	

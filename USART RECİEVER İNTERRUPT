@@ -1,0 +1,29 @@
+org 00h
+	sjmp start
+org 23h ; serial port interrupt vector address
+	sjmp serial_read
+	
+org 30h
+	start:
+	setb EA ;enable all set interrupt 
+	setb ES ;serial port interrupt enable bit
+	mov TMOD, #21h ; Timer 1 in mode 2 and Timer 0 is in 16 bit mode
+	mov SCON, #50h ; UART with mode 1 (8 bit) REN = 1
+	mov th0, #0fdh 
+	mov tl0, #0fdh ; 9600 bauds at 11.0592 MHz
+	setb tr1 ; Stars Timer 1
+	
+	loop:
+	sjmp loop
+	
+	serial_read:
+	mov a, SBUF
+    cjne a, #01h, check ; check if buffer is TRUE
+    setb p3.7       ; turn on the led
+	clr ri
+	reti	
+check: cjne a, #00h, loop  ;check if buffer is FALSE
+       clr p3.7          ; turn off the led
+	   clr ri        ;clear receiver interrupt
+	 reti
+	

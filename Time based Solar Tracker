@@ -1,0 +1,171 @@
+count equ r0
+sec   equ r1
+min   equ r2
+hour  equ r3
+var1  equ r4
+delay equ r5
+buz   bit p3.7
+
+
+org 0000h
+jmp main
+
+; this timer interupt need 11 machine cycles to execuate so we load timer values according to calculation + 11
+; in this way error will be minimum and time for clock will be accurate 
+
+org 000BH        ; timer 0 interrupt
+mov th0,#3ch
+mov tl0,#0bbh
+inc count
+reti
+
+
+main:
+clr p3.6
+call delay2
+setb p3.6
+clr buz
+mov ie,#82H
+mov sp,#50h
+mov tmod,#01h    ; timer 0 used as a timer in mode 1 (16-bit)
+mov th0,#3ch     ; values for 50 ms delay
+mov tl0,#0bbh
+
+; let say u r usng 12 MHz oscillator then 12 MHz/12 =1 MHz = 1us
+; (65536-xx)*1 us = 50 ms
+; (65536-xx) = 50000
+; xx = 15536 which is 3cb0 in hex
+; calaulated values + 11 for acurate timing
+; 15536 + 11 = 15547 which is 3cbb in hex
+
+
+setb tr0        ; start timer to produce delay
+call load
+back:
+cjne count,#20,exit
+mov count,#0
+inc sec
+jnb buz,skip
+clr buz
+skip:
+cjne sec,#60,exit
+mov sec,#0
+inc min
+dec th1
+mov a,th1
+cjne a,#-1, next
+mov th1,#59
+next:
+cjne min,#60,exit
+mov min,#0
+inc hour
+dec tl1
+mov a,tl1
+cjne a,#-1, nxt
+mov tl1,#05	
+nxt:
+cjne hour,#6,exit ; if hour=6
+mov hour,#0       ; again hour =0
+exit:
+call display_min
+call display_hour
+call check_buz
+call buttons
+jmp back
+
+load:
+mov th1,#59 ; minutes
+mov tl1,#05 ; hour
+mov count,#0
+mov sec,#0
+mov min,#0
+mov hour,#0
+ret
+
+display_min:
+mov a,th1
+mov b,#10
+div ab      			 ; a= quiotient   b= remainder
+mov p2,a
+mov p1,b
+ret
+
+
+display_hour:
+mov a,tl1
+mov b,#10
+div ab      			 ; a= quiotient   b= remainder
+mov p0,b
+ret
+
+check_buz:
+mov a,th1
+jnz rev
+mov a,tl1
+jnz rev
+setb buz   ; buzzer on
+call load
+rev:
+ret
+
+buttons:
+jb int0,nnext
+call min_set
+call delay_250
+nnext:
+jb int1,neext
+call hour_set
+call delay_250
+neext:
+jb rxd,eexit
+call load
+call delay_250
+eexit:
+ret
+
+delay_250:
+mov delay,#250          ;delay 250ms
+call delayms
+mov delay,#250          ;delay 250ms
+call delayms 
+ret
+
+min_set:
+dec th1
+mov a,th1
+cjne a,#-1,next1
+mov th1,#59
+next1:
+ret
+
+hour_set:
+dec tl1
+mov a,tl1
+cjne a,#-1,next2
+mov tl1,#05
+next2:
+ret
+
+delayms:
+mov var1,#230
+d:
+nop
+nop
+djnz var1,d
+djnz delay,delayms
+ret
+delay2:							 ;DELAY OF ONE SECOND
+ 		MOV TMOD,#01H
+		MOV TH0,#3CH
+		MOV TL0,#0B0H
+		MOV R7,#00H
+		SETB TR0
+	DEL:JNB TF0,DEL
+		MOV TH0,#3CH
+		MOV TL0,#0B0H
+		CLR TF0
+		INC R7	
+		CJNE R7,#14H,DEL
+		RET
+ 
+end

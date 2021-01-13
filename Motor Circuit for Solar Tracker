@@ -1,0 +1,58 @@
+org 00h
+
+main:
+mov p3,#0ffh
+mov p1,#00b
+
+scan:
+jnb p3.3,west
+jnb p3.2,east
+jmp scan
+
+east:
+clr p1.5
+call delay
+setb p1.3
+setb p1.2
+call delay53
+clr p1.2
+clr p1.3
+jmp scan
+
+
+
+west:
+clr p1.2
+call delay
+setb p1.6
+setb p1.5
+call delay53
+clr p1.5
+clr p1.6
+jmp scan
+
+
+
+
+
+delay:							 ;DELAY OF ONE SECOND
+ 		MOV TMOD,#01H
+		MOV TH0,#3CH
+		MOV TL0,#0B0H
+		MOV R7,#00H
+		SETB TR0
+	DEL:JNB TF0,DEL
+		MOV TH0,#3CH
+		MOV TL0,#0B0H
+		CLR TF0
+		INC R7	
+		CJNE R7,#14H,DEL
+		REt
+
+delay53:
+mov r2,#53
+eee:call delay
+djnz r2,eee
+ret
+
+end
